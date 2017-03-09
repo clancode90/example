@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns="http://www.springframework.org/schema/security" 
+             xmlns:beans="http://www.springframework.org/schema/beans" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+          http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+  
+    <http pattern="/css/**" security="none" />
+    <http pattern="/js/**" security="none" />
+  
+    <http pattern="/img/**" security="none" />
+    <http pattern="/fonts/**" security="none" />
+    
+    <http auto-config='true' use-expressions="true" >
+        <intercept-url pattern="/login.jsp" access="hasAnyRole('ROLE_ANONYMOUS')" />
+        <intercept-url pattern="/Registration/registration" access="hasAnyRole('ROLE_ANONYMOUS')" />
+        <intercept-url pattern="/Registration/successRegistration" access="hasAnyRole('ROLE_ANONYMOUS')" />
+        <intercept-url pattern="/User/recoveryPassword" access="hasAnyRole('ROLE_ANONYMOUS')" />
+        <intercept-url pattern="/User/recoverPassword" access="hasAnyRole('ROLE_ANONYMOUS')" />
+        
+        <intercept-url pattern="/index" access="hasAnyRole('user', 'admin')" />  
+        <intercept-url pattern="/" access="hasAnyRole('user', 'admin')" />  
+        <intercept-url pattern="/User/successChangePassword" access="hasAnyRole('user', 'admin')" /> 
+        <intercept-url pattern="/User/changePassword" access="hasAnyRole('user', 'admin')" /> 
+        <intercept-url pattern="/Lk/lk" access="hasAnyRole('user', 'admin')" />  
+        <intercept-url pattern="/Lk/selectLk" access="hasAnyRole('user', 'admin')" />
+        
+        <intercept-url pattern="/**" access="hasRole('admin')" />
+        
+        <logout logout-url="/logout" logout-success-url="/" invalidate-session="true"/>
+        <form-login login-page="/login.jsp" default-target-url="/Lk/lk" always-use-default-target="true" authentication-failure-url="/login.jsp?error=true" />
+
+           
+        <anonymous username="guest" granted-authority="ROLE_ANONYMOUS" />
+    </http>
+    
+ 
+  
+    <authentication-manager>
+        <authentication-provider >
+            <password-encoder hash="md5"/>
+            <jdbc-user-service data-source-ref="dataSource" 
+                               users-by-username-query="select email, password, true from users where email=?"
+                               authorities-by-username-query="select e.email, u.user_role from users e, cabinet_user u WHERE e.user_id=u.user_id and e.email=? limit 1"/> 
+        </authentication-provider>
+    </authentication-manager>
+</beans:beans>
